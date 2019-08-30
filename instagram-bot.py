@@ -7,15 +7,16 @@ from bs4 import BeautifulSoup as bs
 import time
 from urllib.request import urlopen
 import re
+from validate_email import validate_email
 
 def split_str(s):
   return [ch for ch in s]
 
-emailGood = False
-passwordGood = False
-hashtagGood = False
+email_good = False
+password_good = False
+hashtag_good = False
 
-goodCharsEmail = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "-", "_", "@"]
+good_chars_email = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "-", "_", "@"]
 
 print("\n")
 print(" .___                __                                              __________        __    ")
@@ -24,38 +25,38 @@ print(" |   |/    \ /  ___|   __\__  \  / ___\_  __ \__  \  /     \   ______ |  
 print(" |   |   |  \\___ \ |  |  / __ \/ /_/  >  | \// __ \|  Y Y  \ /_____/ |    |   (  <_> )  |   ")
 print(" |___|___|  /____  >|__| (____  |___  /|__|  (____  /__|_|  /         |______  /\____/|__|   ")
 print("         \/     \/           \/_____/            \/      \/                 \/               ")
-print("\n \n")
+print("\n")
 print("With the Instagram Bot you can like alot of posts including a specific hashtag.")
 print("\n")
 
-while emailGood == False:
-    email = input("What is your Instagram email adress? \n")
-    email.strip()
-    newEmail = split_str(email)
-    check = bool(set(newEmail).intersection(goodCharsEmail))
-    if check == True:
-        emailGood = True
-    elif len(email) >= 3 and len(email) <= 256:
-        emailGood = True
-    else:
-        emailGood = False
+while email_good == False:
+    email = input("What is your Instagram email adress? ")
+    is_valid = validate_email(email, verify=True)
+    if is_valid == False:
+        email_good = False
+        print("\n")
         print("This isn't a valid E-Mail adress.")
+        print("\n")
+    else:
+        email_good = True
 
 
-while passwordGood == False:
-    password = input("What is your Instagram password? \n")
+while password_good == False:
+    password = input("What is your Instagram password? ")
     password.strip()
     if len(password) <=8:
-        passwordGood = False
+        password_good = False
+        print("\n")
         print("This isn't a valid Instagram password.")
+        print("\n")
     else:
-        passwordGood = True
+        password_good = True
 
-while hashtagGood == False:
-    hashtag = input("Posts with which hashtag do you want to like? \n")
+while hashtag_good == False:
+    hashtag = input("Posts containing which hashtag do you want to like? \n")
     hashtag.replace(" ", "")
     hashtag.replace("#", "")
-    hashtagGood = True
+    hashtag_good = True
 
 class InstagramBot:
 
@@ -110,15 +111,23 @@ class InstagramBot:
         for link in links:
             bot.get(link)
             time.sleep(2)
-            likeButton = bot.find_element_by_class_name("glyphsSpriteHeart__outline__24__grey_9")
-            likeButton.click()
+            like_button = bot.find_element_by_class_name("glyphsSpriteHeart__outline__24__grey_9")
+            like_button.click()
             time.sleep(2)
-           # commentButton = bot.find_element_by_class_name("Ypffh")
-           # commentButton.click()
-           # time.sleep(1)
-           # commentButton.send_keys(comment)
-           # commentButton.send_keys(Keys.RETURN)
-           # time.sleep(2)
+            # comment_button = bot.find_element_by_name("X7cDz")
+            # comment_button.click()
+            # time.sleep(1)
+            # comment_button.send_keys("Nice picture!")
+            # comment_button.send_keys(Keys.RETURN)
+            # time.sleep(2)
+            source = bot.page_source
+            data=bs(source, 'html.parser')
+            body = data.find('body')
+            comment_button = data.find("textarea")
+            # comment_button.send_keys("Nice picture!")
+            # comment_button.send_keys(Keys.RETURN)
+
+
 
 start = InstagramBot(email, password)
 start.login()
